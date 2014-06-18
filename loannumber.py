@@ -36,7 +36,7 @@ def instaPush(appID, secret, activity, trackers):
 #
 #I've included credgapi as a placeholder file in git, but the name of the file
 #doesn't matter as long as the variable points to it correctly.
-credfile = '../credfile'
+credfile = "../keys/credfile"
 #getcreds opens the file that holds usernames and passwords.
 try:
     creds = open(credfile, 'r')
@@ -48,10 +48,12 @@ else:
     #each line into a variable, removing the "return" at the end of each.
     email = creds.readline().rstrip()
     password = creds.readline().rstrip()
+    appID = creds.readline().rstrip()
+    secret = creds.readline().rstrip()
     creds.close()
     #print email, password
     #next, check that we have something in each variable.
-if email == "" or password == "" :
+if email == "" or password == "" or appID = "" or secret == "":
     print "Failed to read one or more of the needed credentials from " + credfile + "\n"
     
 #url is the page where the latest numbers come from
@@ -87,7 +89,6 @@ timestamp = time.strftime("%Y%m%d %H:%M (%Z)")
 #s.quit()
 
 
-print instaPush(appID="537dfb4fa4c48a9a74f98314",
-    secret="4e269102cb1815a18c2b8a9021af806b",
+print instaPush(appID, secret,
     activity="Kiva_number_check",
     trackers={"number": myresult, "date": timestamp})
