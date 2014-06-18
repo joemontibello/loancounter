@@ -1,6 +1,6 @@
 #!/opt/local/bin/python
 
-#loannumber.py
+# loannumber.py
 
 #import needed modules. re, time and sys are part of python, so you
 #get them with an install of the language.
@@ -16,11 +16,16 @@ import simplejson as json
 from email.mime.text import MIMEText
 
 #This chunk is instapush-python, copied from github.
-def instaPush(appID, secret, activity, trackers):
-    url = "http://api.instapush.im/post"
-    headers = {"X-INSTAPUSH-APPID": appID, 'X-INSTAPUSH-APPSECRET': secret, 'Content-Type': 'application/json'}
+
+
+def instapush(localappid, localsecret, activity, trackers):
+
+    pushurl = "http://api.instapush.im/post"
+    headers = {"X-INSTAPUSH-APPID": localappid, 'X-INSTAPUSH-APPSECRET': localsecret,
+               'Content-Type': 'application/json'}
     data = {"event": activity, "trackers": trackers}
-    response = requests.post(url, headers=headers, data=json.dumps(data))
+    msgdata = json.dumps(data)
+    response = requests.post(pushurl, msgdata, headers=headers)
     return response
 
 
@@ -45,33 +50,36 @@ else:
     #each line into a variable, removing the "return" at the end of each.
     email = creds.readline().rstrip()
     password = creds.readline().rstrip()
-    appID = creds.readline().rstrip()
+    appid = creds.readline().rstrip()
     secret = creds.readline().rstrip()
     you = creds.readline().rstrip()
     creds.close()
     #print email, password
     #next, check that we have something in each variable.
-if email == "" or password == "" or appID = "" or secret == "":
+if email == "" or password == "" or appid == "" or secret == "":
     print "Failed to read one or more of the needed credentials from " + credfile + "\n"
-    
+
 #url is the page where the latest numbers come from
 url = "http://viva.kiva.org"
 loginpage = url + "/en/user/login?destination=home"
 datapage = url + "/en/home"
 #print loginpage
 
-logindata = {'name' : email, 'pass' : password, 'form_id' : 'user_login', 'submit' : 'Log in'}
+logindata = {'name': email, 'pass': password, 'form_id': 'user_login', 'submit': 'Log in'}
 
 #auth = HTTPBasicAuth(email, password)
 s = requests.session()
 s.keep_alive = False
-r = s.post(url=loginpage, data=logindata, cookies = s.cookies)
+r = s.post(url=loginpage, data=logindata, cookies=s.cookies)
 
-gotpage = s.get(datapage, cookies = s.cookies, verify=True)
-prog = re.compile(r".*kiva-statistics-teamleader.*<tr class=\"odd\"><td>English</td><td>([0-9]+)</td>.*Loans to be Reviewed by Partner Limit", re.MULTILINE|re.DOTALL)
+gotpage = s.get(datapage, cookies=s.cookies, verify=True)
+# noinspection PyPep8
+prog = re.compile(
+    r".*kiva-statistics-teamleader.*<tr class=\"odd\"><td>English</td><td>([0-9]+)</td>.*Loans to be Reviewed by Partner Limit",
+    re.MULTILINE | re.DOTALL)
 result = prog.match(gotpage.text)
 myresult = result.group(1)
-output = "<html><head><title>" + myresult +"</title></head><body>" + myresult +"<h1></h1></body></html>"
+output = "<html><head><title>" + myresult + "</title></head><body>" + myresult + "<h1></h1></body></html>"
 timestamp = time.strftime("%Y%m%d %H:%M (%Z)")
 
 msg = MIMEText(myresult + "\n" + timestamp)
@@ -81,10 +89,9 @@ msg['Subject'] = subject
 msg['From'] = email
 msg['To'] = you
 s = smtplib.SMTP(host='mailhub3.dartmouth.edu')
-s.sendmail(me, [you], msg.as_string())
+s.sendmail(email, [you], msg.as_string())
 s.quit()
 
-
-print instaPush(appID, secret,
-    activity="Kiva_number_check",
-    trackers={"number": myresult, "date": timestamp})
+print instapush(appid, secret,
+                activity="Kiva_number_check",
+                trackers={"number": myresult, "date": timestamp})
