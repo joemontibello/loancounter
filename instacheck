@@ -1,0 +1,5 @@
+curl -X GET \
+    -H "x-instapush-appid: [appid]" \
+    -H "x-instapush-appsecret: [appsecret]" \
+    https://api.instapush.im/v1/events/list
+    
