@@ -5,12 +5,9 @@
 #import needed modules. re, time and sys are part of python, so you
 #get them with an install of the language.
 import re
-import sys
 import time
 #requests makes http requesting easier.
 import requests
-from requests.auth import HTTPBasicAuth
-#soup = BeautifulSoup(html_doc)
 # Import smtplib for the actual sending function
 import smtplib
 import simplejson as json
@@ -50,6 +47,7 @@ else:
     password = creds.readline().rstrip()
     appID = creds.readline().rstrip()
     secret = creds.readline().rstrip()
+    you = creds.readline().rstrip()
     creds.close()
     #print email, password
     #next, check that we have something in each variable.
@@ -76,17 +74,15 @@ myresult = result.group(1)
 output = "<html><head><title>" + myresult +"</title></head><body>" + myresult +"<h1></h1></body></html>"
 timestamp = time.strftime("%Y%m%d %H:%M (%Z)")
 
-#msg = MIMEText(myresult + "\n" + timestamp)
-#server = smtplib.SMTP(host='smtp.gmail.com', port=587)
-#me = 'joe@viva.kiva.org'
-#you = 'gezo727jiba@post.wordpress.com' 
-#subject = "English Queue"
-#msg['Subject'] = subject
-#msg['From'] = me
-#msg['To'] = you
-#s = smtplib.SMTP(host='mailhub3.dartmouth.edu')
-#s.sendmail(me, [you], msg.as_string())
-#s.quit()
+msg = MIMEText(myresult + "\n" + timestamp)
+server = smtplib.SMTP(host='smtp.gmail.com', port=587)
+subject = "English Queue"
+msg['Subject'] = subject
+msg['From'] = email
+msg['To'] = you
+s = smtplib.SMTP(host='mailhub3.dartmouth.edu')
+s.sendmail(me, [you], msg.as_string())
+s.quit()
 
 
 print instaPush(appID, secret,
