@@ -2,8 +2,8 @@
 
 # loannumber.py
 
-#import needed modules. re, time and sys are part of python, so you
-#get them with an install of the language.
+# import needed modules. re, time and sys are part of python, so you
+# get them with an install of the language.
 import re
 import time
 #requests makes http requesting easier.
@@ -11,15 +11,14 @@ import requests
 # Import smtplib for the actual sending function
 import smtplib
 import simplejson as json
-
 # Import the email modules we'll need
 from email.mime.text import MIMEText
-
+#import pdb
+import sys
 #This chunk is instapush-python, copied from github.
 
 
 def instapush(localappid, localsecret, activity, trackers):
-
     pushurl = "http://api.instapush.im/post"
     headers = {"X-INSTAPUSH-APPID": localappid, 'X-INSTAPUSH-APPSECRET': localsecret,
                'Content-Type': 'application/json'}
@@ -44,6 +43,9 @@ try:
     creds = open(credfile, 'r')
 except IOError:
     print "Failed to open credential store at " + credfile + "\n"
+    raise
+except:
+    print "Unexpected error:", sys.exc_info()[0]
     raise
 else:
     #If we opened the credentials properly, we can pull
@@ -73,25 +75,29 @@ s.keep_alive = False
 r = s.post(url=loginpage, data=logindata, cookies=s.cookies)
 
 gotpage = s.get(datapage, cookies=s.cookies, verify=True)
-# noinspection PyPep8
-prog = re.compile(
-    r".*kiva-statistics-teamleader.*<tr class=\"odd\"><td>English</td><td>([0-9]+)</td>.*Loans to be Reviewed by Partner Limit",
-    re.MULTILINE | re.DOTALL)
-result = prog.match(gotpage.text)
-myresult = result.group(1)
-output = "<html><head><title>" + myresult + "</title></head><body>" + myresult + "<h1></h1></body></html>"
-timestamp = time.strftime("%Y%m%d %H:%M (%Z)")
+#pdb.set_trace()
+prog = re.compile(r".*statistics-teamleader.*<tr class=\"odd\"><td>English</td><td>([0-9]+)</td>.*Loans to be Reviewed",
+                  re.MULTILINE | re.DOTALL)
+try:
+    result = prog.match(gotpage.text)
+except:
+    print "Regex failed"
+    raise
+else:
+    myresult = result.group(1)
+    output = "<html><head><title>" + myresult + "</title></head><body>" + myresult + "<h1></h1></body></html>"
+    timestamp = time.strftime("%Y%m%d %H:%M (%Z)")
+    msg = MIMEText(myresult + "\n" + timestamp)
+    server = smtplib.SMTP(host='smtp.gmail.com', port=587)
+    subject = "English Queue"
+    msg['Subject'] = subject
+    msg['From'] = email
+    msg['To'] = you
+    s = smtplib.SMTP(host='mailhub3.dartmouth.edu')
+    s.sendmail(email, [you], msg.as_string())
+    s.quit()
 
-msg = MIMEText(myresult + "\n" + timestamp)
-server = smtplib.SMTP(host='smtp.gmail.com', port=587)
-subject = "English Queue"
-msg['Subject'] = subject
-msg['From'] = email
-msg['To'] = you
-s = smtplib.SMTP(host='mailhub3.dartmouth.edu')
-s.sendmail(email, [you], msg.as_string())
-s.quit()
+pushsuccess = instapush(appid, secret,
+                        activity="Kiva_number_check",
+                        trackers={"number": myresult, "date": timestamp})
 
-print instapush(appid, secret,
-                activity="Kiva_number_check",
-                trackers={"number": myresult, "date": timestamp})
