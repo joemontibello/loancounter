@@ -19,12 +19,18 @@ import sys
 
 
 def instapush(localappid, localsecret, activity, trackers):
+    """
+
+    :rtype : object
+    """
     pushurl = "http://api.instapush.im/post"
     headers = {"X-INSTAPUSH-APPID": localappid, 'X-INSTAPUSH-APPSECRET': localsecret,
                'Content-Type': 'application/json'}
     data = {"event": activity, "trackers": trackers}
     msgdata = json.dumps(data)
     response = requests.post(pushurl, msgdata, headers=headers)
+    if response.text = "<Response [200]>":
+        sys.exit()
     return response
 
 
