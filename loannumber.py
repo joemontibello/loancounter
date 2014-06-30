@@ -8,6 +8,7 @@ import re
 import time
 #requests makes http requesting easier.
 import requests
+from os import getcwd
 # Import smtplib for the actual sending function
 import smtplib
 import simplejson as json
@@ -43,6 +44,8 @@ def instapush(localappid, localsecret, activity, trackers):
 #
 #I've included credgapi as a placeholder file in git, but the name of the file
 #doesn't matter as long as the variable points to it correctly.
+wd = getcwd()
+print wd
 credfile = "../keys/credfile"
 #getcreds opens the file that holds usernames and passwords.
 try:
