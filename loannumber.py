@@ -45,8 +45,7 @@ def instapush(localappid, localsecret, activity, trackers):
 #I've included credgapi as a placeholder file in git, but the name of the file
 #doesn't matter as long as the variable points to it correctly.
 wd = getcwd()
-print wd
-credfile = "../keys/credfile"
+credfile = "{0}/../keys/credfile".format(wd)
 #getcreds opens the file that holds usernames and passwords.
 try:
     creds = open(credfile, 'r')
