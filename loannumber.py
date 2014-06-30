@@ -29,7 +29,7 @@ def instapush(localappid, localsecret, activity, trackers):
     data = {"event": activity, "trackers": trackers}
     msgdata = json.dumps(data)
     response = requests.post(pushurl, msgdata, headers=headers)
-    if response.text = "<Response [200]>":
+    if response.text == "<Response [200]>":
         sys.exit()
     return response
 
