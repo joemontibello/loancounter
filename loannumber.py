@@ -38,8 +38,7 @@ def instapush(localappid, localsecret, activity, trackers):
 
 if os.isatty(sys.stdin.fileno()):
     # Debug mode.
-    wd = os.getcwd
-    credfile = "../keys/credfile".format(wd)
+    credfile = "../keys/credfile"
 else:
     # Cron mode.
     wd = getcwd()
