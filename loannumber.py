@@ -8,7 +8,7 @@ import re
 import time
 #requests makes http requesting easier.
 import requests
-from os import getcwd
+import os
 # Import smtplib for the actual sending function
 import smtplib
 import simplejson as json
@@ -35,6 +35,15 @@ def instapush(localappid, localsecret, activity, trackers):
     return response
 
 
+
+if os.isatty(sys.stdin.fileno()):
+    # Debug mode.
+    wd = os.getcwd
+    credfile = "../keys/credfile".format(wd)
+else:
+    # Cron mode.
+    wd = getcwd()
+    credfile = "{0}/keys/credfile".format(wd)
 #credfile is the full path to the file that holds usernames and passwords
 #To work, you need a plain text file. It should have 2 values, each on its own
 #line, with no blank lines.  They need to be ordered like this:
@@ -42,11 +51,6 @@ def instapush(localappid, localsecret, activity, trackers):
 #  password (Viva password)
 # This is a terrible hack that I want to replace with Oauth2.
 #
-#I've included credgapi as a placeholder file in git, but the name of the file
-#doesn't matter as long as the variable points to it correctly.
-wd = getcwd()
-credfile = "{0}/../keys/credfile".format(wd)
-#getcreds opens the file that holds usernames and passwords.
 try:
     creds = open(credfile, 'r')
 except IOError:
