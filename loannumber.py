@@ -35,13 +35,12 @@ def instapush(localappid, localsecret, activity, trackers):
     return response
 
 
-
 if os.isatty(sys.stdin.fileno()):
     # Debug mode.
     credfile = "../keys/credfile"
 else:
     # Cron mode.
-    wd = getcwd()
+    wd = os.getcwd()
     credfile = "{0}/keys/credfile".format(wd)
 #credfile is the full path to the file that holds usernames and passwords
 #To work, you need a plain text file. It should have 2 values, each on its own
